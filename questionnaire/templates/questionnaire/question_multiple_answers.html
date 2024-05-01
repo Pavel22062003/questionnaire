@@ -1,0 +1,81 @@
+{% extends 'questionnaire/base.html' %}
+{% load dictionary_get %}
+
+{% block content %}
+<body style="text-align: center;">
+    <div style="border: 1px solid black; padding: 20px; display: inline-block; text-align: left;">
+        <h1>{{ unit.title }}</h1>
+        <form method="POST" id="surveyForm" style="width: 300px;">
+            {% csrf_token %}
+            {% for question in unit.questions.all %}
+            <div style="margin-bottom: 10px;">
+                <label for="{{ question.uuid }}" style="display: inline-block; width: 200px;">{{ question.text }}</label>
+                {% with user_answer=user_answers|get:question.uuid %}
+                <input type="text" id="{{ question.uuid }}" name="{{ question.uuid }}" class="form-control" placeholder="Введите ответ"
+                    value="{{ user_answer|default_if_none:'' }}" style="width: 200px;">
+                {% endwith %}
+            </div>
+            {% endfor %}
+            <button type="submit" id="submitButton" disabled>Ответить</button>
+            {% if unit.previous_block.all.first %}
+            <a href="{% url 'questionnaire:survey_question' block_id=unit.previous_block.all.first.current_block.uuid %}"
+                class="btn btn-secondary">Назад</a>
+            {% endif %}
+        </form>
+        <div id="errorMessage" style="color: red;"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var inputs = document.querySelectorAll('input[type="text"]');
+            var submitButton = document.getElementById('submitButton');
+
+            function updateSubmitButtonState() {
+                var allFieldsFilled = true;
+
+                inputs.forEach(function (input) {
+                    if (input.value.trim() === '') {
+                        allFieldsFilled = false;
+                    }
+                });
+
+                if (allFieldsFilled) {
+                    submitButton.removeAttribute('disabled');
+                } else {
+                    submitButton.setAttribute('disabled', 'disabled');
+                }
+            }
+
+            inputs.forEach(function (input) {
+                input.addEventListener('input', updateSubmitButtonState);
+            });
+
+            updateSubmitButtonState();
+
+            document.querySelector('#surveyForm').addEventListener('submit', function (event) {
+                var allFieldsFilled = true;
+
+                inputs.forEach(function (input) {
+                    if (input.value.trim() === '') {
+                        allFieldsFilled = false;
+                        input.style.borderColor = 'red';
+                    } else {
+                        input.style.borderColor = '';
+                    }
+                });
+
+                if (!allFieldsFilled) {
+                    var errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = 'Пожалуйста, заполните все поля.';
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+{% endblock %}
+
+
+
+
+

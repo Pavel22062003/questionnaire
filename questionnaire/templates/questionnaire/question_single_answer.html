@@ -1,0 +1,46 @@
+{% extends 'questionnaire/base.html' %}
+{% load dictionary_get %}
+
+{% block content %}
+<body style="text-align: center;">
+    <div style="border: 1px solid black; padding: 20px; display: inline-block; text-align: left;">
+        <h1>{{ unit.title }}</h1>
+        <form id="surveyForm" method="POST" style="width: 300px;">
+            {% csrf_token %}
+            {% for answer in unit.answers.all %}
+            <div style="margin-bottom: 10px;">
+                <input type="radio" name="answer" value="{{ answer.uuid }}" {% if user_answers|default_if_none:''|get:answer.uuid %}checked{% endif %} onclick="uncheckOthers(this)" style="margin-right: 10px;"> {{ answer.answer }}<br>
+            </div>
+            {% endfor %}
+            <button type="submit" id="submitButton" disabled style="margin-top: 10px;">Ответить</button>
+            {% if unit.previous_block.all.first %}
+            <a href="{% url 'questionnaire:survey_question' block_id=unit.previous_block.all.first.current_block.uuid %}"
+                class="btn btn-secondary" style="display: block; margin-top: 10px;">Назад</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <script>
+        function uncheckOthers(checkbox) {
+            var checkboxes = document.querySelectorAll('input[type="radio"]');
+            var submitButton = document.getElementById('submitButton');
+            var atLeastOneChecked = false;
+            checkboxes.forEach(function (cb) {
+                if (cb.checked) {
+                    atLeastOneChecked = true;
+                }
+            });
+            if (atLeastOneChecked) {
+                submitButton.removeAttribute('disabled');
+            } else {
+                submitButton.setAttribute('disabled', 'disabled');
+            }
+        }
+    </script>
+</body>
+{% endblock %}
+
+
+
+
+

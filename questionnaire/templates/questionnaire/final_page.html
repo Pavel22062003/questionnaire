@@ -1,0 +1,22 @@
+{% extends 'questionnaire/base.html' %}
+
+{% block content %}
+<body style="text-align: center;">
+    <h1>Спасибо за прохождение!</h1>
+    <div style="border: 1px solid black; padding: 20px; display: inline-block; text-align: left;">
+        <h2>Ваши ответы:</h2>
+        <ul>
+            {% for user_answer in user_answers %}
+            <li>
+                {% if user_answer.question %}
+                    {{ user_answer.question.text }}: {{ user_answer.user_answer }}
+                {% else %}
+                    {{ user_answer.answer.current_block.title }}: {{ user_answer.user_answer }}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+{% endblock %}
+

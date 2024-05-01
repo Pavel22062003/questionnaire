@@ -1,0 +1,36 @@
+{% extends 'questionnaire/base.html' %}
+{% load mediapath %}
+
+{% block content %}
+<style>
+    .card {
+        border: 1px solid black; /* Устанавливаем черные рамки для карточек */
+    }
+
+    .card-body {
+        text-align: center; /* Выравниваем текст внутри .card-body по центру */
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row">
+        {% for questionnaire in questionnaires %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ questionnaire.img|mediapath }}" class="card-img-top"
+                     style="width:100%; height:auto; aspect-ratio:16/9;">
+                <div class="card-body">
+                    <h5 class="card-title" style="font-family: Impact, sans-serif;">{{ questionnaire.name }}</h5>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'questionnaire:start_questions' questionnaire.pk %}" class="btn btn-primary">Начать опрос</a>
+                    {% else %}
+                        <p>Для прохождения опроса требуется регистрация.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
