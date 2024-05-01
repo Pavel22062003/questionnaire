@@ -4,7 +4,7 @@ from django.db import models
 
 class Questionnaire(BaseModel):
     name = models.CharField(max_length=100)
-    img = models.ImageField(upload_to='questionnaires/', null=True)
+    img = models.ImageField(upload_to='questionnaires/', null=True, blank=True)
 
 
 class Block(BaseModel):
